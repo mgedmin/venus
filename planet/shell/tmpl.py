@@ -2,6 +2,7 @@ from xml.sax.saxutils import escape
 import sgmllib, time, os, sys, new, urlparse, re
 from planet import config, feedparser
 import htmltmpl
+from hashlib import md5
 
 voids=feedparser._BaseHTMLProcessor.elements_no_end_tag
 empty=re.compile(r"<((%s)[^>]*)></\2>" % '|'.join(voids))
@@ -212,6 +213,11 @@ def template_info(source):
             item['guid_isPermaLink']='true'
         else:
             item['guid_isPermaLink']='false'
+
+    # synthesize id_hash attribute
+    for item in output['Items']:
+        if 'id' in item:
+            item['id_hash'] = md5(item['id']).hexdigest()
 
     # feed level information
     output['generator'] = config.generator_uri()
